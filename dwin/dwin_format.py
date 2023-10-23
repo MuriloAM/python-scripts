@@ -41,7 +41,7 @@ def get_pack_len(comm, addr, data):
     pack_len = comm + addr + data
     pack_len = int(len(pack_len) / 2)
     pack_len = conv_int_to_hex(pack_len)
-    print("pack_len:{}".format)
+    # print("pack_len:{}".format)
     return pack_len
 
 def dwin_conv_to_hex(msg_frame):
@@ -63,16 +63,18 @@ def dwin_make_frame(comm, addr, data):
     # packge_len of command + addr + data
     check_comm(comm)
     pack_len = get_pack_len(comm, addr, data)
-    print("pack_len:{} bytes".format(pack_len))
+    # print("pack_len:{} bytes".format(pack_len))
     # concatenate DWIN_HEADER + package_len + command + addr + data
     out_frame = DWIN_HEADER + pack_len + comm + addr + data
     # convert to hex represented string
     out_frame = dwin_conv_to_hex(out_frame)
-    print("dwin_out:{}".format(out_frame))
+    # print("dwin_out:{}".format(out_frame))
     # return package frame
+    return out_frame
 
 def main():
-    dwin_make_frame("82", "5000", "82508090AAdEcadeafcedafafe")
+    dwin_frame = dwin_make_frame("82", "5000", "82508090AAdEcadeafcedafafe")
+    print("frame_out:{}".format(dwin_frame))
 
 if __name__ == "__main__":
     main()
