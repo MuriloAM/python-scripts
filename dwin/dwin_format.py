@@ -23,19 +23,22 @@ def conv_int_to_hex(value):
     return value
 
 def check_addr(addr):
-    size = size_in_byte(addr)
-    if size == 2:
-        #print("{}: is valid length".format(size))
-        return True
-    else:
-        print("{}: is invalid addr length, dwin addr uses 2bytes".format(size))
-        return False
+    addr_len = size_in_byte(addr)
+    if addr_len != 2:
+        print("{}: is invalid addr length, dwin addr uses 2bytes".format(addr_len))
+        sys.exit(0)
 
 def check_comm(comm):
-    return size_in_byte(comm)
+    comm_len =  size_in_byte(comm)
+    if comm_len != 1:
+        print("{}: is invalid comm length".format(comm_len))
+        sys.exit(0)
 
 def check_data(data):
-    return size_in_byte(data)
+    data_len = size_in_byte(data)
+    if data_len == 0:
+        print("data can't be null")
+        sys.exit(0)
 
 def get_pack_len(comm, addr, data):
     pack_len = comm + addr + data
