@@ -43,39 +43,23 @@ def serial_ports():
             pass
     return result
 
-def main():
-    serialPort = serial.Serial(
-        port =  "COM3", 
-        baudrate = 115200, 
-        bytesize = serial.EIGHTBITS, 
-        parity = serial.PARITY_EVEN, 
-        stopbits = serial.STOPBITS_ONE, 
-        timeout = 10, 
-        xonxoff = False, 
-        rtscts = False, 
-        write_timeout = 5, 
-        dsrdtr = False, 
-        inter_byte_timeout = None, 
-        exclusive = None)
-    # serialPort.port = 'COM6'
-    # serialPort.timeout = 1.0
-    # serialPort.baudrate = 115200
-    # serialPort.parity = 'N'
-    # serialPort.bytesize = 8
-    # serialPort.stopbits = 1
+def main(port, x):
+    serialPort = serial.Serial()
     
-    # if search_comport(serialPort.port):
-    #     print("{}: found".format(serialPort.port))
-    # else:
-    #     print("{}: not found".format(serialPort.port))
+    serialPort.port =  port
+    serialPort.baudrate = 115200
+    serialPort.bytesize = serial.EIGHTBITS
+    serialPort.parity = serial.PARITY_EVEN
+    serialPort.stopbits = serial.STOPBITS_ONE
     
-    # serialPort.open()
-    # serialPort.write(b'download')
-    # if serialPort.is_open():
-        # print("port:{} is open()".format(serialPort.port))
-    # else:
-        # print("port:{} is not open()".format(serialPort.port))
-    serialPort.write(b'A')
+    while not serialPort.is_open:
+        print("port:{} disconnected, try to reconnect...".format(serialPort.port))
+        serialPort.open()
+        sleep(0.5)
+    else:
+        print("connected to port:{}".format(serialPort.port))
+
+    serialPort.write(b'\x5A\xA5\x05\x82\x50\x00\x00\x01')
     serialPort.close()
     
     # serialString = ""  # Used to hold data coming over UART
@@ -94,5 +78,7 @@ def main():
 
 if __name__ == "__main__":
     print(serial_ports())
-    main()
+    x = 90
+    # while x < 10:
+    main("/dev/ttyUSB0", x)
     
