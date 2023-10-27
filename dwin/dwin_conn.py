@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import glob
+import pickle
 import serial
 import serial.tools.list_ports as port_list
 from time import sleep
@@ -60,14 +61,9 @@ if __name__ == "__main__":
             body_len = ("{0:X}".format(body_len))
 
         msg_frame = "{}{}{}".format(HEADER, body_len, body_data)
-        # print("body_data:{}, body_len:{}".format(body_data, body_len))
+        print("body_data:{}, body_len:{}".format(body_data, body_len))
         
         return msg_frame
-        # frame_data = "{}{}{}".format(HEADER, body_len, body_data)
-
-        # print("msg:{}".format(frame_data))
-        # return frame_data
-        pass
     
     def main(port):
 
@@ -88,36 +84,35 @@ if __name__ == "__main__":
         try:
             serialPort.flushInput()
             serialPort.flushOutput()
-            print("port:{} is connected, send a message".format(serialPort.port))
+            print("name:{}, port:{} is connected, send a message".format(serialPort.name, serialPort.port))
 
             val = 0
 
             while True:
-                line = serialPort.readline()
-                line = line.hex()
-                # data_raw = data_raw.upper()
-
-                if line != "":
-                    # my_str = str(line, 'utf-8')
-                    # print(type(line))
-                    print(line)
+                msg_in = serialPort.readline()
+                
+                if msg_in != b'':
+                    # msg_in = msg_in.upper()
+                    # msg_in = int(msg_in)
+                    # my_str = str(msg_in, 'utf-8')
+                    # print(type(msg_in))
+                    print("rx:{}".format(msg_in.hex()))
                     # print(my_str)
                     # print("data_raw:{}".format(data_raw))
                     break
-                else:
-                    hex_string = write_frame("5002", val)
-                    # print("tx:{}".format(hex_string))
+                elif val < 10:
+                    hex_string = write_frame(5002, val)
+                    print("tx:{}".format(hex_string))
                     # prepara str to hex format
                     hex_bytes = bytes.fromhex(hex_string)
-                    # serialPort.write(hex_bytes)
+                    serialPort.write(hex_bytes)
+                    print("tx:", hex_bytes)
+                    print("tx:", hex_bytes.hex())
                     # 5AA5 06 83 5000 01 CABA
                     # 5a69204fe9
 
-                    # val = val + 1
-                    # if val > 10:
-                    #     break
-                    
-                    # sleep(0.1)
+                    val = val + 1
+                    sleep(0.1)
                 
         except KeyboardInterrupt:
             print("\nclosing serialPort:{}".format(serialPort.port))
@@ -126,22 +121,6 @@ if __name__ == "__main__":
         finally:
             print("\ntranmission done closing serialPort:{}".format(serialPort.port))
             serialPort.close()
-    
-    def main2(port):
-        try:
-            display = dwin_conn(port, 115200)
-            display.connect()
-            while True:
-                try:
-                    
-                    print("main2 is running")
-                except:
-                    pass
-                
-                sleep(5)
-        except :
-            print("except trig")
-            pass
     
     print("OS:{}".format(sys.platform))
     print("available com port:{}".format(serial_ports()))
