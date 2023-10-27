@@ -1,10 +1,6 @@
 #!/usr/bin/python
 import sys
 
-DWIN_HEADER = "5AA5"
-WRITE = "82"
-READ = "83"
-HS = "4FFB"
 HEADER = "5AA5"
 ADDR_LEN = 2
 
@@ -17,7 +13,6 @@ def size_in_byte(value):
     else:
         print("{}: is invalid length, type only pair hex char".format(size))
         sys.exit(0)
-
 
 def conv_int_to_hex(value):
     if value < 16:
@@ -81,6 +76,9 @@ def dwin_serialize(cmd, addr, data):
     out_frame = out_frame.upper()
     out_frame = bytes.fromhex(out_frame)
     return out_frame
+
+def dwin_deserialize(data):
+    return data.upper().hex()
 
 if __name__ == "__main__":
     def main():
