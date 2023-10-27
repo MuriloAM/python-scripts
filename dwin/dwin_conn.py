@@ -1,20 +1,9 @@
 #!/usr/bin/python
 import sys
 import glob
-import pickle
 import serial
-import serial.tools.list_ports as port_list
 from time import sleep
 
-def search_comport(comport):
-    # print("search for COMx ports...")
-    # ports = list(port_list.comports())
-    # for p in ports:
-    #     print("{}".format(ports))
-    #     if ports == comport:
-    #         return True
-    # if comport isn't found in ports return False
-    return False
 
 def serial_ports():
     """ Lists serial port names
