@@ -61,7 +61,6 @@ if __name__ == "__main__":
             body_len = ("{0:X}".format(body_len))
 
         msg_frame = "{}{}{}".format(HEADER, body_len, body_data)
-        print("body_data:{}, body_len:{}".format(body_data, body_len))
         
         return msg_frame
     
@@ -72,7 +71,7 @@ if __name__ == "__main__":
         serialPort.port =  port
         serialPort.baudrate = 115200
         serialPort.bytesize = serial.EIGHTBITS
-        serialPort.parity = serial.PARITY_EVEN
+        serialPort.parity = serial.PARITY_NONE
         serialPort.stopbits = serial.STOPBITS_ONE
         serialPort.timeout = .1
 
@@ -99,15 +98,13 @@ if __name__ == "__main__":
                     print("rx:{}".format(msg_in.hex()))
                     # print(my_str)
                     # print("data_raw:{}".format(data_raw))
-                    break
+                    # break
                 elif val < 10:
                     hex_string = write_frame(5002, val)
-                    print("tx:{}".format(hex_string))
+                    # print("tx:{}".format(hex_string))
                     # prepara str to hex format
                     hex_bytes = bytes.fromhex(hex_string)
-                    serialPort.write(hex_bytes)
-                    print("tx:", hex_bytes)
-                    print("tx:", hex_bytes.hex())
+                    # serialPort.write(hex_bytes)
                     # 5AA5 06 83 5000 01 CABA
                     # 5a69204fe9
 
