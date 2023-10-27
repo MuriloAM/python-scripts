@@ -1,10 +1,15 @@
 #!/usr/bin/python
 import sys
 import glob
+from dwin_format import dwin_serialize, dwin_deserialize
 import serial
 from time import sleep
 
 serialPort = []
+DWIN_HEADER = "5AA5"
+DWIN_WRITE = "82"
+DWIN_READ = "83"
+DWIN_ = "4F4B"
 
 def serial_ports():
     """ Lists serial port names
@@ -35,6 +40,10 @@ def serial_ports():
     return result
 
 def connect(port, baud):
+    """ 
+        Open serial communication with dwin display using default serial parameters,
+        only port and baudRate is required.
+    """
     try_connect = 0
     global serialPort
     print("connecting to dwin-display on port:{}".format(port))
@@ -52,8 +61,29 @@ def connect(port, baud):
     return True
 
 def disconnect():
+    """ 
+        Close serial communication with dwin display.
+    """
     print("\nclosing serialPort:{}".format(serialPort.port))
     serialPort.close()
+
+def write(addr, data):
+    """ 
+        Write data in dwin-display ram addr and check operation's return
+    """
+    print("sending message")
+    data_frame = dwin_serialize(DWIN_WRITE, addr, data)
+    serialPort.write(data_frame)
+
+    data_response = ""
+    while data_response == "":
+        rec_data = serialPort.readline()
+        
+        rec_data.hex()
+        rec_data.upper()
+        if rec_data.startswith(DWIN_HEADER):
+            data_response = rec_data
+        # print("response:{}".format(rec_data))
 
 if __name__ == "__main__":
     
@@ -61,14 +91,15 @@ if __name__ == "__main__":
         print("OS:{}".format(sys.platform))
         print("available com port:{}".format(serial_ports()))
         connect("/dev/ttyUSB0", 115200)
+        write(5000, "murilo")
 
         while True:
             sleep(1)
     except:
-        print("\nexception ocurr, closing serialPort:{}".format(serialPort.port))
+        print("\nexception ocurr, closing serialPort:{}".format(serialPort.portstr))
         serialPort.close()
     finally:
-        print("\nscript done, closing serialPort:{}".format(serialPort.port))
+        print("\nscript done, closing serialPort:{}".format(serialPort.portstr))
         serialPort.close()
     
     # def write_frame(addr, data):
