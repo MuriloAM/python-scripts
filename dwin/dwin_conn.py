@@ -42,7 +42,6 @@ class DwinConn:
         self.s = serial.Serial(port, baud, timeout=0.1)
     
     def __del__(self):
-        print("deletando objeto")
         self.s.close()
         
     def write(self, addr, data):
@@ -53,8 +52,9 @@ class DwinConn:
             self.s.write(tx_msg)
         
     def read(self, addr, len):
-        if int(len) > 0x7c:
-            print("len is more than limit, redefine with 7C")
+        len_in_hex = "0x" + len
+        len_msg = int(len_in_hex, 16)
+        if len_msg > 0x7C:
             len = "7C"
         tx_msg = dwin_serialize("83", addr, len)
         self.s.write(tx_msg)
