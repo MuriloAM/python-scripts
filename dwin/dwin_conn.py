@@ -51,6 +51,17 @@ class DwinConn:
         else:
             tx_msg = dwin_serialize("82", addr, data)
             self.s.write(tx_msg)
+        
+    def read(self, addr, len):
+        if int(len) > 0x7c:
+            print("len is more than limit, redefine with 7C")
+            len = "7C"
+        tx_msg = dwin_serialize("83", addr, len)
+        self.s.write(tx_msg)
+        while self.s.in_waiting == 0:
+            pass
+        if self.s.in_waiting > 0:
+            return self.s.readline().hex().upper()
 
 if __name__ == "__main__":
     def write_frame(addr, data):
