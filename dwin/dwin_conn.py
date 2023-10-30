@@ -4,6 +4,7 @@ import glob
 import serial
 import serial.tools.list_ports as port_list
 from time import sleep
+from dwin_format import dwin_serialize
 
 def serial_ports():
     """ Lists serial port names
@@ -32,6 +33,17 @@ def serial_ports():
         except (OSError, serial.SerialException):
             pass
     return result
+
+class DwinConn:
+    DWIN_WRITE = "82"
+    DWIN_READ = "83"
+
+    def __init__(self, port, baud):
+        self.s = serial.Serial(port, baud, timeout=0.1)
+    
+    def __del__(self):
+        print("deletando objeto")
+        self.s.close()
 
 if __name__ == "__main__":
     def write_frame(addr, data):
@@ -73,7 +85,7 @@ if __name__ == "__main__":
                 if serialPort.in_waiting > 0:
                     print("tem algo na serial, len:{}".format(serialPort.in_waiting))
                     msg_in = serialPort.readline()
-                    print("rx:{}".format(msg_in.hex().upper()))                    
+                    print("rx:{}".format(msg_in.hex().upper()))
                 elif val < 10:
                     hex_string = write_frame(5002, val)
                     print("tx:{}".format(hex_string))
