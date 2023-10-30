@@ -5,6 +5,7 @@ import serial
 import serial.tools.list_ports as port_list
 from time import sleep
 from dwin_format import dwin_serialize
+from dwin_const import *
 
 def serial_ports():
     """ Lists serial port names
@@ -35,8 +36,6 @@ def serial_ports():
     return result
 
 class DwinConn:
-    DWIN_WRITE = "82"
-    DWIN_READ = "83"
 
     def __init__(self, port, baud):
         self.s = serial.Serial(port, baud, timeout=0.1)
@@ -48,7 +47,7 @@ class DwinConn:
         if self.s.in_waiting > 0:
             print("rx_buffer is full")
         else:
-            tx_msg = dwin_serialize("82", addr, data)
+            tx_msg = dwin_serialize(DWIN_WRITE, addr, data)
             self.s.write(tx_msg)
         
     def read(self, addr, len):
@@ -56,12 +55,16 @@ class DwinConn:
         len_msg = int(len_in_hex, 16)
         if len_msg > 0x7C:
             len = "7C"
-        tx_msg = dwin_serialize("83", addr, len)
+        tx_msg = dwin_serialize(DWIN_READ, addr, len)
         self.s.write(tx_msg)
         while self.s.in_waiting == 0:
             pass
         if self.s.in_waiting > 0:
             return self.s.readline().hex().upper()
+    
+    def reboot(self):
+        rst_msg = dwin_serialize(DWIN_WRITE, SYS_RST_ADDR, SYS_RST_DATA)
+        self.s.write(rst_msg)
 
 if __name__ == "__main__":
     def write_frame(addr, data):
