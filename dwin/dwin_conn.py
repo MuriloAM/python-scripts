@@ -44,6 +44,13 @@ class DwinConn:
     def __del__(self):
         print("deletando objeto")
         self.s.close()
+        
+    def write(self, addr, data):
+        if self.s.in_waiting > 0:
+            print("rx_buffer is full")
+        else:
+            tx_msg = dwin_serialize("82", addr, data)
+            self.s.write(tx_msg)
 
 if __name__ == "__main__":
     def write_frame(addr, data):
