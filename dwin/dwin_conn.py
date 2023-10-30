@@ -65,6 +65,16 @@ class DwinConn:
     def reboot(self):
         rst_msg = dwin_serialize(DWIN_WRITE, SYS_RST_ADDR, SYS_RST_DATA)
         self.s.write(rst_msg)
+    
+    def get_page(self):
+        page_msg = dwin_serialize(DWIN_READ, PIC_NOW, "01")
+        self.s.write(page_msg)
+        return self.s.readline().hex().upper()
+
+    def set_page(self, page):
+        page_msg = dwin_serialize(DWIN_WRITE, PIC_SET, "01")
+        self.s.write(page_msg)
+        return self.s.readline().hex().upper()
 
 if __name__ == "__main__":
     def write_frame(addr, data):
