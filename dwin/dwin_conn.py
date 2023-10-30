@@ -70,10 +70,10 @@ if __name__ == "__main__":
             val = 0
 
             while True:
-                msg_in = serialPort.readline()
-                
-                if msg_in != b'':
-                    print("rx:{}".format(msg_in.hex().upper()))
+                if serialPort.in_waiting > 0:
+                    print("tem algo na serial, len:{}".format(serialPort.in_waiting))
+                    msg_in = serialPort.readline()
+                    print("rx:{}".format(msg_in.hex().upper()))                    
                 elif val < 10:
                     hex_string = write_frame(5002, val)
                     print("tx:{}".format(hex_string))
