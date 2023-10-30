@@ -24,7 +24,7 @@ def conv_int_to_hex(value):
         value = ("0{0:X}".format(value))
     else:
         value = ("{0:X}".format(value))
-    print(value)
+    # print(value)
     return value
 
 def check_addr(addr):
