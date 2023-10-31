@@ -2,7 +2,6 @@
 import sys
 import glob
 import serial
-import serial.tools.list_ports as port_list
 from time import sleep
 from dwin_format import dwin_serialize
 from dwin_const import *
@@ -93,19 +92,70 @@ if __name__ == "__main__":
         if data < 16:
             data = ("0{0:X}".format(data))
         else:
-            data = ("{0:X}".format(data))
-        
-        body_data = "82{}{}".format(addr, data)
-        body_len = int(len(body_data) / 2)
+            return False
+    print("connected!")
+    return True
 
-        if body_len < 16:
-            body_len = ("0{0:X}".format(body_len))
-        else:
-            body_len = ("{0:X}".format(body_len))
+def disconnect():
+    """ 
+        Close serial communication with dwin display.
+    """
+    print("\nclosing serialPort:{}".format(serialPort.port))
+    serialPort.close()
 
-        msg_frame = "{}{}{}".format(HEADER, body_len, body_data)
+def write(addr, data):
+    """ 
+        Write data in dwin-display ram addr and check operation's return
+    """
+    print("sending message")
+    data_frame = dwin_serialize(DWIN_WRITE, addr, data)
+    serialPort.write(data_frame)
+
+    data_response = ""
+    while data_response == "":
+        rec_data = serialPort.readline()
         
-        return msg_frame
+        rec_data.hex()
+        rec_data.upper()
+        if rec_data.startswith(DWIN_HEADER):
+            data_response = rec_data
+        # print("response:{}".format(rec_data))
+
+if __name__ == "__main__":
+    
+    try:
+        print("OS:{}".format(sys.platform))
+        print("available com port:{}".format(serial_ports()))
+        connect("/dev/ttyUSB0", 115200)
+        write(5000, "murilo")
+
+        while True:
+            sleep(1)
+    except:
+        print("\nexception ocurr, closing serialPort:{}".format(serialPort.portstr))
+        serialPort.close()
+    finally:
+        print("\nscript done, closing serialPort:{}".format(serialPort.portstr))
+        serialPort.close()
+    
+    # def write_frame(addr, data):
+    #     HEADER = "5AA5"
+    #     if data < 16:
+    #         data = ("0{0:X}".format(data))
+    #     else:
+    #         data = ("{0:X}".format(data))
+        
+    #     body_data = "82{}{}".format(addr, data)
+    #     body_len = int(len(body_data) / 2)
+
+    #     if body_len < 16:
+    #         body_len = ("0{0:X}".format(body_len))
+    #     else:
+    #         body_len = ("{0:X}".format(body_len))
+
+    #     msg_frame = "{}{}{}".format(HEADER, body_len, body_data)
+        
+    #     return msg_frame
     
     def main(port, baud):
 
@@ -116,12 +166,17 @@ if __name__ == "__main__":
             serialPort.open()
             sleep(0.5)
 
-        try:
-            serialPort.flushInput()
-            serialPort.flushOutput()
-            print("name:{}, port:{} is connected, send a message".format(serialPort.name, serialPort.port))
+    #     while not serialPort.is_open:
+    #         print("port:{} disconnected, try to reconnect...".format(serialPort.port))
+    #         serialPort.open()
+    #         sleep(0.5)
 
-            val = 0
+    #     try:
+    #         serialPort.flushInput()
+    #         serialPort.flushOutput()
+    #         print("name:{}, port:{} is connected, send a message".format(serialPort.name, serialPort.port))
+
+    #         val = 0
 
             while True:
                 if serialPort.in_waiting > 0:
@@ -137,9 +192,9 @@ if __name__ == "__main__":
                     val = val + 1
                     sleep(1)
                 
-        except KeyboardInterrupt:
-            print("\nclosing serialPort:{}".format(serialPort.port))
-            serialPort.close()
+    #     except KeyboardInterrupt:
+    #         print("\nclosing serialPort:{}".format(serialPort.port))
+    #         serialPort.close()
         
         finally:
             print("\ntranmission done closing serialPort:{}".format(serialPort.port))

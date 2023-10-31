@@ -1,10 +1,6 @@
 #!/usr/bin/python
 import sys
 
-DWIN_HEADER = "5AA5"
-WRITE = "82"
-READ = "83"
-HS = "4FFB"
 HEADER = "5AA5"
 ADDR_LEN = 2
 
@@ -18,13 +14,11 @@ def size_in_byte(value):
         print("{}: is invalid length, type only pair hex char".format(size))
         sys.exit(0)
 
-
 def conv_int_to_hex(value):
     if value < 16:
         value = ("0{0:X}".format(value))
     else:
         value = ("{0:X}".format(value))
-    # print(value)
     return value
 
 def check_addr(addr):
@@ -51,40 +45,45 @@ def get_pack_len(cmd, addr, data):
     pack_len = conv_int_to_hex(pack_len)
     return pack_len
 
-def dwin_serialize(cmd, addr, data):
-    """ Check cmd addr and data sizes create a frame with header and message size
-        convert all frame bytes to hex-string to be able to be transmitted via serial.
-        
-        addr len is 2(bytes)
-        cmd len is 2(bytes)
-        data cannot be less than 1byte
+class dwin_format:
+    def serialize(self, cmd, addr, data):
+        """ Check cmd addr and data sizes create a frame with header and message size
+            convert all frame bytes to hex-string to be able to be transmitted via serial.
+            
+            addr len is 2(bytes)
+            cmd len is 2(bytes)
+            data cannot be less than 1byte
 
-        frame format:
-        header + size + cmd + addr + data(bytes)
-        5AA5     04     82    5000   01         -> write 01B on addr 0x5000
-        5AA5     04     83    5000   01         -> read 01 byte from addr 0x5000
+            frame format:
+            header + size + cmd + addr + data(bytes)
+            5AA5     04     82    5000   01         -> write 01B on addr 0x5000
+            5AA5     04     83    5000   01         -> read 01 byte from addr 0x5000
 
-        write confirmation:
-        header + size + cmd + response(bytes)
-        5AA5     03     82    4FFB
+            write confirmation:
+            header + size + cmd + response(bytes)
+            5AA5     03     82    4FFB
 
-    """
-    # check addr, it has to be 2bytes size
-    check_addr(addr)
-    # check data, it has to be at least 2bytes, cannot be null
-    check_data(data)
-    # packge_len of command + addr + data
-    check_comm(cmd)
-    pack_len = get_pack_len(cmd, addr, data)
-    # mount a frame to trasmit
-    out_frame = HEADER + pack_len + cmd + addr + data
-    out_frame = out_frame.upper()
-    out_frame = bytes.fromhex(out_frame)
-    return out_frame
+        """
+        # check addr, it has to be 2bytes size
+        check_addr(addr)
+        # check data, it has to be at least 2bytes, cannot be null
+        check_data(data)
+        # packge_len of command + addr + data
+        check_comm(cmd)
+        pack_len = get_pack_len(cmd, addr, data)
+        # mount a frame to trasmit
+        out_frame = HEADER + pack_len + cmd + addr + data
+        out_frame = out_frame.upper()
+        out_frame = bytes.fromhex(out_frame)
+        return out_frame
+
+    def deserialize(self, data):
+        return data.upper().hex()
 
 if __name__ == "__main__":
     def main():
-        dwin_frame = dwin_serialize("82", "5000", "01")
+        frame_maker = dwin_format()
+        dwin_frame = frame_maker.serialize("82", "5000", "01")
         print("frame_out:{}".format(dwin_frame))
     
     main()
