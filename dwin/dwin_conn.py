@@ -46,7 +46,6 @@ class DwinConn:
     def update(self):
         if self.s.in_waiting > 0:
             rx_msg = self.s.readline().hex().upper()
-            # print("rx_msg:{}".format(rx_msg))
             return rx_msg
         else:
             return None
