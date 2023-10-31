@@ -42,6 +42,13 @@ class DwinConn:
     
     def __del__(self):
         self.s.close()
+
+    def update(self):
+        if self.s.in_waiting > 0:
+            rx_msg = self.s.readline().hex.upper()
+            return rx_msg
+        else:
+            return
         
     def write(self, addr, data):
         if self.s.in_waiting > 0:
