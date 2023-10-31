@@ -55,8 +55,12 @@ class DwinConn:
         if self.s.in_waiting > 0:
             print("rx_buffer is full")
         else:
+            rx = None
             tx_msg = dwin_serialize(DWIN_WRITE, addr, data)
             self.s.write(tx_msg)
+            while rx is None:
+                rx = self.update()
+            return rx
         
     def read(self, addr, len):
         len_in_hex = "0x" + len
