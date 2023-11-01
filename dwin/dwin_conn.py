@@ -78,9 +78,9 @@ class DwinConn:
         print("reboot ret:{}".format(ret))
     
     def get_page(self):
-        page_msg = serialize(DWIN_READ, DWIN_PIC_NOW, DWIN_READ_1BYTE)
-        self.s.write(page_msg)
-        return self.s.readline().hex().upper()
+        page = self.read(DWIN_PIC_NOW, DWIN_READ_1BYTE)
+        page = page[14:]
+        return int(page)
 
     def set_page(self, page):
         page_msg = serialize(DWIN_WRITE, DWIN_PIC_SET, DWIN_READ_1BYTE)
