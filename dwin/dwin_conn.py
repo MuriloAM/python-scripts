@@ -60,16 +60,16 @@ class DwinConn:
             return rx
         
     def read(self, addr, len):
+        rx = None
         len_in_hex = "0x" + len
         len_msg = int(len_in_hex, 16)
         if len_msg > 0x7C:
             len = DWIN_READ_MAX_LEN
         tx_msg = serialize(DWIN_READ, addr, len)
         self.s.write(tx_msg)
-        while self.s.in_waiting == 0:
-            pass
-        if self.s.in_waiting > 0:
-            return self.s.readline().hex().upper()
+        while rx is None:
+            rx = self.update()
+        return rx
     
     def reboot(self):
         # rst_msg = serialize(DWIN_WRITE, DWIN_SYS_RST_ADDR, DWIN_SYS_RST_DATA)
