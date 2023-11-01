@@ -83,9 +83,9 @@ class DwinConn:
         return int(page)
 
     def set_page(self, page):
-        page_msg = serialize(DWIN_WRITE, DWIN_PIC_SET, DWIN_READ_1BYTE)
-        self.s.write(page_msg)
-        return self.s.readline().hex().upper()
+        my_str = "5A01{:04X}".format(page)
+        ret = self.write(DWIN_PIC_SET, my_str)
+        return ret
 
 if __name__ == "__main__":
     print("OS:{}".format(sys.platform))
