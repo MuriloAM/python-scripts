@@ -116,9 +116,8 @@ class DwinConn:
         return int(page)
 
     def set_page(self, page):
-        my_str = "5A01{:04X}".format(page)
-        ret = self.write(DWIN_PIC_SET, my_str)
-        return ret
+        my_str = "{}{:04X}".format(DWIN_PIC_SET_EN, page)
+        return self.write(DWIN_PIC_SET, my_str)
 
 if __name__ == "__main__":
     print("OS:{}".format(sys.platform))
