@@ -86,7 +86,7 @@ class DwinConn:
             self.s.write(tx_msg)
             while rx is None:
                 rx = self.update()
-            return rx
+            return self.verify(rx, addr)
         
     def read(self, addr, len):
         rx = None
