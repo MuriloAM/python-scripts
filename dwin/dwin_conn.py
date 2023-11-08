@@ -42,11 +42,13 @@ class DwinConn:
         self.s.close()
 
     def update(self):
-        if self.s.in_waiting > 0:
-            rx_msg = self.s.readline().hex().upper()
-            return rx_msg
-        else:
-            return None
+        rx_msg = None
+        while self.s.in_waiting > 0:
+            if rx_msg == None:
+                rx_msg = ""
+            rx = self.s.readline().hex().upper()
+            rx_msg = rx_msg + rx
+        return rx_msg
         
     def write(self, addr, data):
         if self.s.in_waiting > 0:
