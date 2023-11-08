@@ -41,6 +41,33 @@ class DwinConn:
     def __del__(self):
         self.s.close()
 
+    def verify(self, rx_msg, addr, len=None):
+        if not rx_msg.startswith(DWIN_HEADER):
+            return False
+        # take only command from rx_msg
+        comm = rx_msg[6:8]
+        # verify write command response 
+        if comm == DWIN_WRITE:
+            data = rx_msg[8:]
+            if data == DWIN_CONFIRM:
+                return True
+            else:
+                return False
+        # verify read command response and return only msg
+        elif comm == DWIN_READ:
+            # check if addr match
+            rx_addr = rx_msg[8:12]
+            if rx_addr != addr:
+                return False
+            # check if rx_len match
+            rx_len = rx_msg[12:14]
+            rx_len = int(rx_len, 16)
+            len = int(len, 16)
+            if rx_len != len:
+                return False
+            # split rx_msg 
+            return rx_msg[14:]
+    
     def update(self):
         rx_msg = None
         while self.s.in_waiting > 0:
@@ -71,7 +98,7 @@ class DwinConn:
         self.s.write(tx_msg)
         while rx is None:
             rx = self.update()
-        return rx
+        return self.verify(rx, addr, len)
     
     def reboot(self):
         # rst_msg = serialize(DWIN_WRITE, DWIN_SYS_RST_ADDR, DWIN_SYS_RST_DATA)
