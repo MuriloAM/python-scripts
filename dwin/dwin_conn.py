@@ -4,6 +4,7 @@ import glob
 import serial
 from dwin_format import serialize
 from dwin_const import *
+from time import sleep
 
 def serial_ports():
     """ Lists serial port names
@@ -101,10 +102,13 @@ class DwinConn:
         return self.verify(rx, addr, len)
     
     def reboot(self):
-        # rst_msg = serialize(DWIN_WRITE, DWIN_SYS_RST_ADDR, DWIN_SYS_RST_DATA)
-        # self.s.write(rst_msg)
-        ret = self.write(DWIN_SYS_RST_ADDR, DWIN_SYS_RST_DATA)
-        print("reboot ret:{}".format(ret))
+        if self.write(DWIN_SYS_RST_ADDR, DWIN_SYS_RST_DATA):
+            sleep(1)
+            if self.s.in_waiting > 0:
+                self.s.reset_input_buffer()
+            return True
+        else:
+            return False
     
     def get_page(self):
         page = self.read(DWIN_PIC_NOW, DWIN_READ_1BYTE)
