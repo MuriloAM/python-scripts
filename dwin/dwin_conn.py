@@ -112,7 +112,6 @@ class DwinConn:
     
     def get_page(self):
         page = self.read(DWIN_PIC_NOW, DWIN_READ_1BYTE)
-        page = page[14:]
         return int(page)
 
     def set_page(self, page):
